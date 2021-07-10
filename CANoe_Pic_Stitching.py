@@ -9,8 +9,13 @@ path_grey = '\灰色'
 path_blue = '\蓝色'
 path_output = '\Elements'
 
-def pinjie(key, images, path1):
-    # 获取当前文件夹中所有JPG图像
+def pinjie(key, images, path):
+    """ 拼接图像
+        key-文件名
+        images-要拼接的图像序列
+        path-拼接后的图像保存路径
+    """
+    # 获取当前文件夹中所有图像
     im_list = [Image.open(fn) for fn in images]
     # 把图片存入ims列表中
     ims = []
@@ -24,30 +29,39 @@ def pinjie(key, images, path1):
     for i, im in enumerate(ims):
         result.paste(im, box=(i * width, 0))
     # 保存图片
-    path = os.path.join(path1+path_output, f'{key}.jpg')
+    path = os.path.join(path, f'{key}.jpg')
     result.save(path)
 
 def main():
+    #获取灰色图标文件夹中图片的文件路径和文件名
     for root, dirs, filenames in os.walk(path1+path_grey):
         for name in filenames:
-            file_path = os.path.join(root, name)
-            # print(file_path)
+            #排除文件名中包含括号的图片
             if '(' in name:
                 pass
             else:
+                # 根据图标名字name，拼合出完整的文件路径
+                file_path = os.path.join(root, name)
+                #因为灰色图标文件夹中图标的文件名有两种格式，因此图片的完整路径也有以下两种
                 file0 = file_path
                 file1 = os.path.join(root, f"{name.split('.')[0]} (1).png")
+
+                #蓝色图标文件夹中同名的图标完整路径
                 file2 = os.path.join(path1+path_blue, name)
+
                 print('file0', file0)
                 print('file1', file1)
                 print('file2', file2)
+
+                #如果存在file1，先去看file2是否存在，若存在就拼接file1、file2
                 if os.path.exists(file1):
                     print('nice1')
                     if os.path.exists(file2):
                         print('nice2')
-                        pinjie(name.split('.')[0], (file1, file1, file2),path1)
+                        pinjie(name.split('.')[0], (file1, file1, file2),path1+path_output)
+                #如果存在file2，就直接拼接file0、file2
                 elif os.path.exists(file2):
-                    pinjie(name.split('.')[0], (file0, file0, file2),path1)
+                    pinjie(name.split('.')[0], (file0, file0, file2),path1+path_output)
 
 if __name__ == '__main__':
     main()
